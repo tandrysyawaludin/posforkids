@@ -1,8 +1,9 @@
 "use client";
 
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback, useEffect } from "react";
 import { Scan, X } from "lucide-react";
 import BigButton from "./BigButton";
+import { useCamera } from "@/lib/useCamera";
 
 interface OcrScannerProps {
   onScan: (code: string) => void;
@@ -10,41 +11,28 @@ interface OcrScannerProps {
 }
 
 export default function OcrScanner({ onScan, onClose }: OcrScannerProps) {
-  const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const streamRef = useRef<MediaStream | null>(null);
-  const [active, setActive] = useState(false);
+  const { videoRef, active, error, startCamera, stopCamera, setError } =
+    useCamera();
   const [scanning, setScanning] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [starting, setStarting] = useState(false);
 
-  const startCamera = useCallback(async () => {
-    try {
-      setError(null);
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment" },
-        audio: false,
-      });
-      streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play();
-      }
-      setActive(true);
-    } catch {
-      setError("Cannot access camera. Please allow camera permission.");
-    }
-  }, []);
-
-  const stopCamera = useCallback(() => {
-    streamRef.current?.getTracks().forEach((t) => t.stop());
-    streamRef.current = null;
-    setActive(false);
+  useEffect(() => {
+    setStarting(true);
+    startCamera().finally(() => setStarting(false));
+    return () => stopCamera();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const scanCode = useCallback(async () => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
     if (!video || !canvas || scanning) return;
+
+    if (video.videoWidth === 0) {
+      setError("Camera not ready yet. Wait a second and try again!");
+      return;
+    }
 
     setScanning(true);
     setError(null);
@@ -81,11 +69,17 @@ export default function OcrScanner({ onScan, onClose }: OcrScannerProps) {
     } finally {
       setScanning(false);
     }
-  }, [scanning, stopCamera, onScan, onClose]);
+  }, [scanning, stopCamera, onScan, onClose, setError, videoRef]);
 
   const handleClose = () => {
     stopCamera();
     onClose();
+  };
+
+  const retryCamera = async () => {
+    setStarting(true);
+    await startCamera();
+    setStarting(false);
   };
 
   return (
@@ -106,15 +100,17 @@ export default function OcrScanner({ onScan, onClose }: OcrScannerProps) {
         </p>
 
         {error && (
-          <p className="text-red-500 text-center mb-4 font-bold">{error}</p>
+          <div className="bg-red-100 text-red-600 p-4 rounded-2xl font-bold text-center mb-4 text-sm">
+            {error}
+          </div>
         )}
 
-        {!active ? (
+        {!active && !starting ? (
           <div className="flex flex-col items-center gap-4 py-8">
-            <div className="text-8xl animate-wiggle">🔍</div>
-            <BigButton onClick={startCamera} color="blue">
+            <div className="text-8xl animate-wiggle">📷</div>
+            <BigButton onClick={retryCamera} color="blue">
               <Scan size={28} />
-              Start Scanner
+              Turn On Camera
             </BigButton>
           </div>
         ) : (
@@ -123,16 +119,28 @@ export default function OcrScanner({ onScan, onClose }: OcrScannerProps) {
               ref={videoRef}
               className="w-full rounded-2xl bg-black aspect-[4/3] object-cover"
               playsInline
+              autoPlay
               muted
             />
+            {starting && (
+              <p className="text-center font-bold text-gray-500">
+                Opening camera...
+              </p>
+            )}
             <BigButton
               onClick={scanCode}
               color="purple"
               className="w-full"
-              disabled={scanning}
+              disabled={scanning || starting}
             >
               {scanning ? "⏳ Reading..." : "🔍 Scan Now!"}
             </BigButton>
+            <button
+              onClick={retryCamera}
+              className="w-full text-center text-sm font-bold text-gray-500"
+            >
+              Camera not working? Tap to retry
+            </button>
           </div>
         )}
 

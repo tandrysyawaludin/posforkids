@@ -3,6 +3,7 @@
 import { useRef, useState, useCallback } from "react";
 import { Camera, X, RotateCcw } from "lucide-react";
 import BigButton from "./BigButton";
+import { useCamera } from "@/lib/useCamera";
 
 interface CameraCaptureProps {
   onCapture: (file: File) => void;
@@ -15,41 +16,21 @@ export default function CameraCapture({
   onClose,
   label = "Take Photo",
 }: CameraCaptureProps) {
-  const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const streamRef = useRef<MediaStream | null>(null);
-  const [active, setActive] = useState(false);
+  const { videoRef, active, error, startCamera, stopCamera } = useCamera();
   const [preview, setPreview] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [starting, setStarting] = useState(false);
 
-  const startCamera = useCallback(async () => {
-    try {
-      setError(null);
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment" },
-        audio: false,
-      });
-      streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play();
-      }
-      setActive(true);
-    } catch {
-      setError("Cannot access camera. Please allow camera permission.");
-    }
-  }, []);
-
-  const stopCamera = useCallback(() => {
-    streamRef.current?.getTracks().forEach((t) => t.stop());
-    streamRef.current = null;
-    setActive(false);
-  }, []);
+  const openCamera = async () => {
+    setStarting(true);
+    await startCamera();
+    setStarting(false);
+  };
 
   const capture = useCallback(() => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
-    if (!video || !canvas) return;
+    if (!video || !canvas || video.videoWidth === 0) return;
 
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
@@ -67,11 +48,11 @@ export default function CameraCapture({
       "image/jpeg",
       0.85
     );
-  }, [stopCamera]);
+  }, [stopCamera, videoRef]);
 
   const retake = () => {
     setPreview(null);
-    startCamera();
+    openCamera();
   };
 
   const confirm = () => {
@@ -107,15 +88,17 @@ export default function CameraCapture({
         </div>
 
         {error && (
-          <p className="text-red-500 text-center mb-4 font-bold">{error}</p>
+          <p className="text-red-500 text-center mb-4 font-bold text-sm">
+            {error}
+          </p>
         )}
 
         {!active && !preview && (
           <div className="flex flex-col items-center gap-4 py-8">
             <div className="text-8xl">📸</div>
-            <BigButton onClick={startCamera} color="blue">
+            <BigButton onClick={openCamera} color="blue" disabled={starting}>
               <Camera size={28} />
-              Open Camera
+              {starting ? "Opening..." : "Open Camera"}
             </BigButton>
           </div>
         )}
@@ -126,6 +109,7 @@ export default function CameraCapture({
               ref={videoRef}
               className="w-full rounded-2xl bg-black aspect-[4/3] object-cover"
               playsInline
+              autoPlay
               muted
             />
             <BigButton onClick={capture} color="pink" className="w-full">
