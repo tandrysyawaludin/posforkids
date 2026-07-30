@@ -16,7 +16,7 @@ A fun, kid-friendly Point of Sale (POS) web app where kids can run their own sho
 ## Tech Stack
 
 - **Next.js 16** (App Router)
-- **Supabase** — PostgreSQL database + Storage for images
+- **Supabase** — PostgreSQL database + Storage buckets for images
 - **Tesseract.js** — client-side OCR for paper code scanning
 - **Tailwind CSS** — styling
 
@@ -26,10 +26,10 @@ A fun, kid-friendly Point of Sale (POS) web app where kids can run their own sho
 
 1. Create a project at [supabase.com](https://supabase.com)
 2. Run the SQL in [`supabase/schema.sql`](supabase/schema.sql) in the SQL Editor
-3. Create two **public** storage buckets:
-   - `avatars`
-   - `items`
-4. Copy your project URL, anon key, and service role key
+3. Create two **public** storage buckets named exactly:
+   - `avatars` — for profile photos
+   - `items` — for menu item photos
+4. Copy your project URL and service role key
 
 ### 2. Environment Variables
 
@@ -57,8 +57,8 @@ Open [http://localhost:3000](http://localhost:3000)
 1. In Vercel → your project → **Integrations** → search **Supabase** → **Connect**  
    (This adds everything automatically — no copy-paste needed!)
 
-2. In Supabase → **SQL Editor** → paste and run `supabase/schema.sql`  
-   Then create two storage buckets: `avatars` and `items` (both public)
+2. In Supabase → **SQL Editor** → run `supabase/schema.sql`  
+   Then create buckets **`avatars`** and **`items`** (both **public**)
 
 3. **Redeploy** in Vercel
 

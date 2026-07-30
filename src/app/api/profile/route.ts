@@ -14,7 +14,12 @@ export async function PUT(request: Request) {
     if (displayName) updates.display_name = displayName.trim();
 
     if (avatarFile && avatarFile.size > 0) {
-      updates.avatar_url = await uploadImage("avatars", user.id, avatarFile, "avatar.jpg");
+      updates.avatar_url = await uploadImage(
+        "avatars",
+        user.id,
+        avatarFile,
+        "avatar.jpg"
+      );
     }
 
     if (Object.keys(updates).length === 0) {

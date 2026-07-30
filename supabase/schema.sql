@@ -54,6 +54,6 @@ CREATE INDEX IF NOT EXISTS idx_items_user_id ON items(user_id);
 CREATE INDEX IF NOT EXISTS idx_items_code ON items(user_id, code);
 CREATE INDEX IF NOT EXISTS idx_orders_user_id ON orders(user_id);
 
--- Storage buckets (run in Supabase Dashboard > Storage)
--- Create bucket: "avatars" (public)
--- Create bucket: "items" (public)
+-- Storage buckets (Supabase Dashboard → Storage → New bucket)
+-- 1. Name: avatars  → Public bucket: ON
+-- 2. Name: items    → Public bucket: ON
