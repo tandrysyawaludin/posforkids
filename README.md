@@ -4,7 +4,7 @@ A fun, kid-friendly Point of Sale (POS) web app where kids can run their own sho
 
 ## Features
 
-- **Login** with username and password
+- **Login** with just your name — no password!
 - **Profile photo** via web camera
 - **Add / Edit / Delete items** with photos and scan codes
 - **Sell items** by scanning codes written on paper (OCR) or typing manually

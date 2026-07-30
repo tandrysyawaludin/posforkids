@@ -1,32 +1,30 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import BigButton from "@/components/BigButton";
 import { apiFetch } from "@/lib/api";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleStart = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
 
-    const res = await apiFetch("/api/auth/login", {
+    const res = await apiFetch("/api/auth/start", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({ username }),
     });
 
     const data = await res.json();
     setLoading(false);
 
     if (!res.ok) {
-      setError(data.error || "Login failed");
+      setError(data.error || "Oops, try again!");
       return;
     }
 
@@ -44,7 +42,7 @@ export default function LoginPage() {
       </div>
 
       <form
-        onSubmit={handleLogin}
+        onSubmit={handleStart}
         className="bg-white rounded-3xl shadow-xl p-8 w-full max-w-md space-y-5"
       >
         {error && (
@@ -55,45 +53,23 @@ export default function LoginPage() {
 
         <div>
           <label className="block text-lg font-bold mb-2 text-[#2d1b4e]">
-            👤 Username
+            👋 What&apos;s your name?
           </label>
           <input
             type="text"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            className="w-full p-4 text-xl rounded-2xl border-4 border-[#ffb3cc] focus:border-[#ff6b9d] outline-none"
-            placeholder="Your name"
+            className="w-full p-5 text-2xl rounded-2xl border-4 border-[#ffb3cc] focus:border-[#ff6b9d] outline-none text-center font-bold"
+            placeholder="Type your name"
+            minLength={2}
+            autoFocus
             required
           />
         </div>
 
-        <div>
-          <label className="block text-lg font-bold mb-2 text-[#2d1b4e]">
-            🔒 Password
-          </label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-4 text-xl rounded-2xl border-4 border-[#b3e5ff] focus:border-[#6bcbff] outline-none"
-            placeholder="Your secret"
-            required
-          />
-        </div>
-
-        <BigButton type="submit" color="pink" className="w-full" disabled={loading}>
-          {loading ? "⏳ Logging in..." : "🚀 Let's Go!"}
+        <BigButton type="submit" color="pink" className="w-full" size="xl" disabled={loading}>
+          {loading ? "⏳ One sec..." : "🚀 Let's Play!"}
         </BigButton>
-
-        <p className="text-center text-gray-600 font-semibold">
-          New here?{" "}
-          <Link
-            href="/register"
-            className="text-[#ff6b9d] font-extrabold hover:underline"
-          >
-            Create Account ✨
-          </Link>
-        </p>
       </form>
     </div>
   );

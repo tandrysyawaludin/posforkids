@@ -1,15 +1,17 @@
 -- POS for Kids - Supabase Schema
 -- Run this in your Supabase SQL Editor
 
--- Users table (kids login with username + password)
+-- Users table (kids just enter their name)
 CREATE TABLE IF NOT EXISTS users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   username TEXT UNIQUE NOT NULL,
-  password_hash TEXT NOT NULL,
   display_name TEXT,
   avatar_url TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- If you already created the table with password_hash, run this:
+-- ALTER TABLE users DROP COLUMN IF EXISTS password_hash;
 
 -- Menu items
 CREATE TABLE IF NOT EXISTS items (
