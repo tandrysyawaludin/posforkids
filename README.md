@@ -50,16 +50,19 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000)
 
-### 4. Deploy to Vercel
+### 4. Deploy to Vercel (for parents — 2 steps!)
 
-1. Push to GitHub
-2. Import project in [Vercel](https://vercel.com)
-3. Add these **required** environment variables (Production + Preview):
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `SUPABASE_SERVICE_ROLE_KEY`
-4. **Redeploy** after adding env vars
-5. Check `https://your-domain.vercel.app/api/health` — should say `"ok": true`
-6. App will be at `https://your-domain.vercel.app`
+**Kids don't need to do this. A grown-up does it once:**
+
+1. In Vercel → your project → **Integrations** → search **Supabase** → **Connect**  
+   (This adds everything automatically — no copy-paste needed!)
+
+2. In Supabase → **SQL Editor** → paste and run `supabase/schema.sql`  
+   Then create two storage buckets: `avatars` and `items` (both public)
+
+3. **Redeploy** in Vercel
+
+That's it! Kids just open the website and type their name. 🎉
 
 ## How Kids Play
 

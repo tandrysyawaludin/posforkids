@@ -1,27 +1,13 @@
 import { NextResponse } from "next/server";
-import {
-  getSessionSecret,
-  getSupabaseServiceKey,
-  getSupabaseUrl,
-} from "@/lib/env";
+import { isAppConfigured } from "@/lib/env";
 
 export async function GET() {
-  const checks = {
-    supabaseUrl: Boolean(getSupabaseUrl()),
-    supabaseServiceKey: Boolean(getSupabaseServiceKey()),
-    sessionSecret: Boolean(getSessionSecret()),
-  };
+  const ok = isAppConfigured();
 
-  const ok = checks.supabaseUrl && checks.supabaseServiceKey;
-
-  return NextResponse.json(
-    {
-      ok,
-      checks,
-      message: ok
-        ? "Ready for deployment"
-        : "Add Supabase env vars in Vercel and redeploy",
-    },
-    { status: ok ? 200 : 503 }
-  );
+  return NextResponse.json({
+    ok,
+    message: ok
+      ? "Ready to play! 🎉"
+      : "Grown-up setup needed — connect Supabase in Vercel",
+  });
 }

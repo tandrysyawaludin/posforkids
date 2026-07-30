@@ -11,9 +11,7 @@ import { getSessionSecret } from "./env";
 function getSecret() {
   const secret = getSessionSecret();
   if (!secret || secret.length < 16) {
-    throw new Error(
-      "Missing env vars. Add NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in Vercel, then redeploy."
-    );
+    throw new Error("SETUP_REQUIRED");
   }
   return new TextEncoder().encode(secret);
 }

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createSession } from "@/lib/auth";
+import { friendlyError } from "@/lib/errors";
 import { getSupabaseAdmin } from "@/lib/supabase";
 
 export async function POST(request: Request) {
@@ -38,15 +39,12 @@ export async function POST(request: Request) {
       .single();
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: friendlyError(error) }, { status: 500 });
     }
 
     await createSession(data.id);
     return NextResponse.json({ user: data });
   } catch (err) {
-    return NextResponse.json(
-      { error: err instanceof Error ? err.message : "Something went wrong" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: friendlyError(err) }, { status: 500 });
   }
 }

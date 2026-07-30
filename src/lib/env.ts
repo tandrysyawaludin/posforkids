@@ -27,19 +27,12 @@ export function getSessionSecret() {
   );
 }
 
+export function isAppConfigured() {
+  return Boolean(getSupabaseUrl() && getSupabaseServiceKey());
+}
+
 export function assertDeployEnv() {
-  const missing: string[] = [];
-
-  if (!getSupabaseUrl()) {
-    missing.push("NEXT_PUBLIC_SUPABASE_URL");
-  }
-  if (!getSupabaseServiceKey()) {
-    missing.push("SUPABASE_SERVICE_ROLE_KEY");
-  }
-
-  if (missing.length > 0) {
-    throw new Error(
-      `Missing env vars: ${missing.join(", ")}. Add them in Vercel and redeploy.`
-    );
+  if (!isAppConfigured()) {
+    throw new Error("SETUP_REQUIRED");
   }
 }
