@@ -37,9 +37,8 @@ Copy `.env.example` to `.env.local` and fill in:
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-SESSION_SECRET=generate_a_random_string_at_least_32_chars
+SESSION_SECRET=optional_if_service_role_key_is_set
 ```
 
 ### 3. Run Locally
@@ -55,12 +54,16 @@ Open [http://localhost:3000](http://localhost:3000)
 
 1. Push to GitHub
 2. Import project in [Vercel](https://vercel.com)
-3. Add the environment variables from step 2
-4. Deploy — the app will be available at `https://your-domain.vercel.app`
+3. Add these **required** environment variables (Production + Preview):
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `SUPABASE_SERVICE_ROLE_KEY`
+4. **Redeploy** after adding env vars
+5. Check `https://your-domain.vercel.app/api/health` — should say `"ok": true`
+6. App will be at `https://your-domain.vercel.app`
 
 ## How Kids Play
 
-1. **Register** with a username and password
+1. **Type your name** and tap Let's Play!
 2. **Add items** — take a photo, give it a name, price, and a short code (e.g. `PIZZA1`)
 3. **Write the code** on a piece of paper
 4. **Go to Sell** — pick a table, scan the paper code or tap items

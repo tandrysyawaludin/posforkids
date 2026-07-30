@@ -6,10 +6,14 @@ import type { User } from "./types";
 const SESSION_COOKIE = "posforkids_session";
 const SESSION_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
 
+import { getSessionSecret } from "./env";
+
 function getSecret() {
-  const secret = process.env.SESSION_SECRET;
+  const secret = getSessionSecret();
   if (!secret || secret.length < 16) {
-    throw new Error("SESSION_SECRET must be set (at least 16 characters)");
+    throw new Error(
+      "Missing env vars. Add NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in Vercel, then redeploy."
+    );
   }
   return new TextEncoder().encode(secret);
 }
