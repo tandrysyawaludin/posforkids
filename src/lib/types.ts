@@ -38,6 +38,8 @@ export interface TableActivity {
   order_id?: string;
   total?: number;
   started_at?: string;
+  source?: "cashier" | "customer";
+  customer_name?: string | null;
 }
 
 export interface OrderItem {

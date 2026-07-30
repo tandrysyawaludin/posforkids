@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase";
+import { getTableAvailabilityError } from "@/lib/tables";
 
 export async function POST(
   request: Request,
@@ -23,6 +24,15 @@ export async function POST(
 
     if (shopError || !shop) {
       return NextResponse.json({ error: "Shop not found" }, { status: 404 });
+    }
+
+    const tableError = await getTableAvailabilityError(
+      supabase,
+      shop.id,
+      table_number
+    );
+    if (tableError) {
+      return NextResponse.json({ error: tableError }, { status: 409 });
     }
 
     const itemIds = items.map((i: { item_id: string }) => i.item_id);

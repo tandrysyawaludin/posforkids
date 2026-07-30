@@ -23,6 +23,8 @@ export default function CustomerOrderPage() {
   const [done, setDone] = useState(false);
   const [error, setError] = useState("");
 
+  const [occupiedTables, setOccupiedTables] = useState<number[]>([]);
+
   useEffect(() => {
     fetch(`/api/shop/${username}/menu`)
       .then((r) => r.json())
@@ -35,6 +37,19 @@ export default function CustomerOrderPage() {
         }
         setLoading(false);
       });
+    const loadTables = () =>
+      fetch(`/api/shop/${username}/tables`)
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.tables) {
+            setOccupiedTables(
+              data.tables.filter((t: { occupied: boolean }) => t.occupied).map((t: { table_number: number }) => t.table_number)
+            );
+          }
+        });
+    loadTables();
+    const interval = setInterval(loadTables, 5000);
+    return () => clearInterval(interval);
   }, [username]);
 
   const total = cart.reduce((s, c) => s + c.item.price * c.quantity, 0);
@@ -135,20 +150,27 @@ export default function CustomerOrderPage() {
         />
         <label className="block font-bold text-[#2d1b4e]">🪑 Pick your table</label>
         <div className="grid grid-cols-4 gap-2">
-          {TABLES.map((t) => (
-            <button
-              key={t}
-              type="button"
-              onClick={() => setTableNumber(tableNumber === t ? null : t)}
-              className={`p-3 rounded-xl font-extrabold text-lg ${
-                tableNumber === t
-                  ? "bg-[#ff6b9d] text-white"
-                  : "bg-gray-100"
-              }`}
-            >
-              {t}
-            </button>
-          ))}
+          {TABLES.map((t) => {
+            const occupied = occupiedTables.includes(t);
+            return (
+              <button
+                key={t}
+                type="button"
+                disabled={occupied}
+                onClick={() => !occupied && setTableNumber(tableNumber === t ? null : t)}
+                className={`p-3 rounded-xl font-extrabold text-lg ${
+                  occupied
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : tableNumber === t
+                      ? "bg-[#ff6b9d] text-white"
+                      : "bg-gray-100"
+                }`}
+              >
+                {t}
+                {occupied && <span className="block text-xs">🚫</span>}
+              </button>
+            );
+          })}
         </div>
       </div>
 

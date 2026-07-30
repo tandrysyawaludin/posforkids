@@ -83,9 +83,11 @@ export default function ItemsPage() {
     setError("");
 
     try {
-      let finalImageUrl = imageUrl;
+      let finalImageUrl = editingItem?.image_url ?? null;
       if (imageFile) {
         finalImageUrl = await uploadImage(imageFile);
+      } else if (imageUrl && !imageUrl.startsWith("blob:")) {
+        finalImageUrl = imageUrl;
       }
 
       if (editingItem) {

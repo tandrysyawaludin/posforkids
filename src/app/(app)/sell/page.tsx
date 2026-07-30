@@ -11,12 +11,14 @@ import { formatPrice, normalizeCode } from "@/lib/utils";
 import { matchItemCode } from "@/lib/matchCode";
 import { TABLES } from "@/lib/constants";
 import ItemImage from "@/components/ItemImage";
-import type { Item, CartItem } from "@/lib/types";
+import type { Item, CartItem, TableActivity } from "@/lib/types";
 
 export default function SellPage() {
   const [items, setItems] = useState<Item[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [tableNumber, setTableNumber] = useState<number | null>(null);
+  const [tables, setTables] = useState<TableActivity[]>([]);
+  const [checkoutError, setCheckoutError] = useState("");
   const [manualCode, setManualCode] = useState("");
   const [showScanner, setShowScanner] = useState(false);
   const [notFound, setNotFound] = useState("");
@@ -41,6 +43,16 @@ export default function SellPage() {
         setShopName(`${data.user.display_name || data.user.username}'s Shop`);
       }
     });
+    const loadTables = () =>
+      apiFetch("/api/tables").then(async (res) => {
+        if (res.ok) {
+          const data = await res.json();
+          setTables(data.tables);
+        }
+      });
+    loadTables();
+    const interval = setInterval(loadTables, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   const total = cart.reduce(
@@ -96,6 +108,7 @@ export default function SellPage() {
   const handleCheckout = async (method: "cash" | "credit") => {
     if (cart.length === 0) return;
     setPaymentMethod(method);
+    setCheckoutError("");
 
     const res = await apiFetch("/api/orders", {
       method: "POST",
@@ -116,6 +129,10 @@ export default function SellPage() {
     if (res.ok) {
       setShowReceipt(true);
       setCompleted(true);
+    } else {
+      const data = await res.json();
+      setCheckoutError(data.error || "Checkout failed");
+      setPaymentMethod(null);
     }
   };
 
@@ -169,22 +186,34 @@ export default function SellPage() {
           🪑 Pick a Table
         </h2>
         <div className="grid grid-cols-4 gap-2">
-          {TABLES.map((t) => (
-            <button
-              key={t}
-              onClick={() => setTableNumber(tableNumber === t ? null : t)}
-              className={`
-                p-4 rounded-2xl text-xl font-extrabold transition-all
-                ${tableNumber === t
-                  ? "bg-[#ff6b9d] text-white scale-105 shadow-md"
-                  : "bg-gray-100 hover:bg-gray-200"
-                }
-              `}
-            >
-              {t}
-            </button>
-          ))}
+          {TABLES.map((t) => {
+            const info = tables.find((tb) => tb.table_number === t);
+            const occupied = info?.occupied;
+            return (
+              <button
+                key={t}
+                type="button"
+                disabled={occupied}
+                onClick={() => !occupied && setTableNumber(tableNumber === t ? null : t)}
+                className={`
+                  p-4 rounded-2xl text-xl font-extrabold transition-all relative
+                  ${occupied
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : tableNumber === t
+                      ? "bg-[#ff6b9d] text-white scale-105 shadow-md"
+                      : "bg-gray-100 hover:bg-gray-200"
+                  }
+                `}
+              >
+                {t}
+                {occupied && <span className="block text-xs mt-1">🚫</span>}
+              </button>
+            );
+          })}
         </div>
+        {checkoutError && (
+          <p className="text-red-500 font-bold text-center mt-3">{checkoutError}</p>
+        )}
       </div>
 
       {/* Scan & manual entry */}

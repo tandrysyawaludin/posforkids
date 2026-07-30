@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireUser } from "@/lib/auth";
 import { getSupabaseAdmin } from "@/lib/supabase";
+import { getTableAvailabilityError } from "@/lib/tables";
 
 export async function GET() {
   try {
@@ -49,13 +50,13 @@ export async function POST(request: Request) {
 
     const supabase = getSupabaseAdmin();
 
-    if (table_number) {
-      await supabase
-        .from("orders")
-        .update({ table_status: "done" })
-        .eq("user_id", user.id)
-        .eq("table_number", table_number)
-        .eq("table_status", "eating");
+    const tableError = await getTableAvailabilityError(
+      supabase,
+      user.id,
+      table_number
+    );
+    if (tableError) {
+      return NextResponse.json({ error: tableError }, { status: 409 });
     }
 
     const { data: order, error: orderError } = await supabase

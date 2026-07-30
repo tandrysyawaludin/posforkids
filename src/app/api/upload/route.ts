@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { requireUser } from "@/lib/auth";
 import { uploadImage, type StorageBucket } from "@/lib/storage";
 
+export const runtime = "nodejs";
+
 export async function POST(request: Request) {
   try {
     const user = await requireUser();
@@ -9,7 +11,7 @@ export async function POST(request: Request) {
     const file = formData.get("file") as File | null;
     const bucket = (formData.get("bucket") as StorageBucket) || "items";
 
-    if (!file) {
+    if (!file || file.size === 0) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
