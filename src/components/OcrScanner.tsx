@@ -1,11 +1,11 @@
 "use client";
 
 import { useRef, useState, useCallback, useEffect } from "react";
-import { Scan, X, Check } from "lucide-react";
+import { Scan, X } from "lucide-react";
 import BigButton from "./BigButton";
 import { useCamera } from "@/lib/useCamera";
 import { recognizeCode } from "@/lib/ocr";
-import { matchItemCode } from "@/lib/matchCode";
+import { normalizeCode } from "@/lib/utils";
 
 interface OcrScannerProps {
   codes: string[];
@@ -19,8 +19,8 @@ export default function OcrScanner({ codes, onScan, onClose }: OcrScannerProps) 
     useCamera();
   const [scanning, setScanning] = useState(false);
   const [starting, setStarting] = useState(false);
-  const [detected, setDetected] = useState<string | null>(null);
-  const [matched, setMatched] = useState<string | null>(null);
+  const [confirmStep, setConfirmStep] = useState(false);
+  const [editableCode, setEditableCode] = useState("");
 
   useEffect(() => {
     setStarting(true);
@@ -41,8 +41,6 @@ export default function OcrScanner({ codes, onScan, onClose }: OcrScannerProps) 
 
     setScanning(true);
     setError(null);
-    setDetected(null);
-    setMatched(null);
 
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
@@ -54,37 +52,33 @@ export default function OcrScanner({ codes, onScan, onClose }: OcrScannerProps) 
     ctx.drawImage(video, 0, 0);
 
     try {
-      const text = await recognizeCode(canvas);
+      const { bestText, matchedCode } = await recognizeCode(canvas, codes);
 
-      if (text.length === 0) {
-        setError("Could not read any code. Write BIGGER letters on the paper!");
+      if (!bestText) {
+        setError(
+          "Could not read anything. Write the code BIG on white paper! 📄"
+        );
         return;
       }
 
-      const match = matchItemCode(text, codes);
-      setDetected(text);
-      setMatched(match);
-
-      if (match) {
-        stopCamera();
-        onScan(match);
-        onClose();
-      } else {
-        setError(`Read "${text}" but no item matches. Check your code or add manually!`);
-      }
+      stopCamera();
+      setEditableCode(matchedCode || bestText);
+      setConfirmStep(true);
     } catch {
       setError("Scan failed. Please try again.");
     } finally {
       setScanning(false);
     }
-  }, [scanning, stopCamera, onScan, onClose, setError, videoRef, codes]);
+  }, [scanning, stopCamera, setError, videoRef, codes]);
 
-  const confirmManual = () => {
-    if (detected) {
-      stopCamera();
-      onScan(detected);
-      onClose();
+  const confirmCode = () => {
+    const code = normalizeCode(editableCode);
+    if (code.length < 1) {
+      setError("Type a code first!");
+      return;
     }
+    onScan(code);
+    onClose();
   };
 
   const handleClose = () => {
@@ -93,13 +87,72 @@ export default function OcrScanner({ codes, onScan, onClose }: OcrScannerProps) 
   };
 
   const retryCamera = async () => {
-    setDetected(null);
-    setMatched(null);
+    setConfirmStep(false);
+    setEditableCode("");
     setError(null);
     setStarting(true);
     await startCamera();
     setStarting(false);
   };
+
+  if (confirmStep) {
+    return (
+      <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
+        <div className="bg-white rounded-3xl p-6 w-full max-w-lg animate-bounce-in space-y-4">
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-extrabold text-[#2d1b4e]">
+              ✅ Is this right?
+            </h2>
+            <button onClick={handleClose} className="p-2 rounded-full bg-gray-100">
+              <X size={24} />
+            </button>
+          </div>
+
+          <p className="text-center text-gray-600 font-semibold">
+            Fix the code if the camera got it wrong ✏️
+          </p>
+
+          <input
+            type="text"
+            value={editableCode}
+            onChange={(e) => setEditableCode(e.target.value.toUpperCase())}
+            className="w-full p-5 text-3xl rounded-2xl border-4 border-[#6bcbff] outline-none focus:border-[#ff6b9d] font-mono text-center font-black"
+            autoFocus
+          />
+
+          {codes.length > 0 && (
+            <div>
+              <p className="text-sm font-bold text-gray-500 mb-2 text-center">
+                Or tap your item code:
+              </p>
+              <div className="flex flex-wrap gap-2 justify-center">
+                {codes.map((code) => (
+                  <button
+                    key={code}
+                    onClick={() => setEditableCode(normalizeCode(code))}
+                    className="px-4 py-2 bg-[#ffb3cc] rounded-xl font-mono font-extrabold text-[#2d1b4e] hover:bg-[#ff6b9d] hover:text-white transition-colors"
+                  >
+                    {code}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <BigButton color="mint" className="w-full" size="xl" onClick={confirmCode}>
+            🛒 Add to Cart!
+          </BigButton>
+
+          <button
+            onClick={retryCamera}
+            className="w-full text-center text-sm font-bold text-gray-500"
+          >
+            📷 Scan again
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
@@ -114,25 +167,16 @@ export default function OcrScanner({ codes, onScan, onClose }: OcrScannerProps) 
           </button>
         </div>
 
-        <p className="text-center text-gray-600 mb-4 font-semibold">
-          Put the code in the box and hold steady 📄
+        <p className="text-center text-gray-600 mb-2 font-semibold">
+          Write code BIG on white paper 📄
+        </p>
+        <p className="text-center text-gray-400 mb-4 text-sm font-semibold">
+          (Scanning products doesn&apos;t work well — use paper!)
         </p>
 
         {error && (
           <div className="bg-red-100 text-red-600 p-4 rounded-2xl font-bold text-center mb-4 text-sm">
             {error}
-          </div>
-        )}
-
-        {detected && !matched && (
-          <div className="bg-yellow-100 text-[#2d1b4e] p-4 rounded-2xl font-bold text-center mb-4">
-            I read: <span className="font-mono text-xl">{detected}</span>
-            <button
-              onClick={confirmManual}
-              className="mt-2 flex items-center justify-center gap-2 w-full text-[#ff6b9d] font-extrabold"
-            >
-              <Check size={20} /> Use this code anyway
-            </button>
           </div>
         )}
 
@@ -154,9 +198,8 @@ export default function OcrScanner({ codes, onScan, onClose }: OcrScannerProps) 
                 autoPlay
                 muted
               />
-              {/* Guide box for where to put the code */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="w-[70%] h-[40%] border-4 border-dashed border-[#6bcbff] rounded-2xl bg-white/10" />
+                <div className="w-[75%] h-[45%] border-4 border-dashed border-[#6bcbff] rounded-2xl bg-white/10" />
               </div>
             </div>
             {starting && (
