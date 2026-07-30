@@ -1,7 +1,11 @@
 import Link from "next/link";
+import { getCurrentUser } from "@/lib/auth";
 import BigButton from "@/components/BigButton";
+import CustomerOrderLink from "@/components/CustomerOrderLink";
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const user = await getCurrentUser();
+
   return (
     <div className="space-y-6 animate-bounce-in">
       <div className="text-center py-6">
@@ -12,7 +16,16 @@ export default function DashboardPage() {
         </p>
       </div>
 
+      {user && <CustomerOrderLink username={user.username} />}
+
       <div className="grid gap-4">
+        <Link href="/incoming">
+          <BigButton color="orange" className="w-full" size="xl">
+            <span className="text-4xl">🛎️</span>
+            Customer Orders
+          </BigButton>
+        </Link>
+
         <Link href="/sell">
           <BigButton color="pink" className="w-full" size="xl">
             <span className="text-4xl">🛒</span>
@@ -21,14 +34,14 @@ export default function DashboardPage() {
         </Link>
 
         <Link href="/tables">
-          <BigButton color="orange" className="w-full" size="xl">
+          <BigButton color="yellow" className="w-full" size="xl">
             <span className="text-4xl">🪑</span>
             Table Activity
           </BigButton>
         </Link>
 
         <Link href="/history">
-          <BigButton color="yellow" className="w-full" size="xl">
+          <BigButton color="mint" className="w-full" size="xl">
             <span className="text-4xl">📜</span>
             Sales History
           </BigButton>
@@ -54,12 +67,11 @@ export default function DashboardPage() {
           💡 How to Play
         </h2>
         <div className="space-y-2 text-gray-700 font-semibold text-left">
-          <p>1️⃣ Add items with a photo and a code</p>
-          <p>2️⃣ Write the code on paper 📄</p>
-          <p>3️⃣ Scan the paper to sell items! 🔍</p>
+          <p>1️⃣ Share customer link — they order from their phone</p>
+          <p>2️⃣ You get a 🛎️ notification when order arrives</p>
+          <p>3️⃣ Add items with a photo and a code</p>
           <p>4️⃣ Pick a table for restaurant play 🪑</p>
           <p>5️⃣ Get paid with cash or credit 💰</p>
-          <p>6️⃣ Send receipt on WhatsApp! 📱</p>
         </div>
       </div>
     </div>

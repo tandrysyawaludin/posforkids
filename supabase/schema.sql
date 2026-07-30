@@ -54,6 +54,32 @@ CREATE INDEX IF NOT EXISTS idx_items_user_id ON items(user_id);
 CREATE INDEX IF NOT EXISTS idx_items_code ON items(user_id, code);
 CREATE INDEX IF NOT EXISTS idx_orders_user_id ON orders(user_id);
 
+-- Self-service customer orders (no login needed for customers)
+CREATE TABLE IF NOT EXISTS self_orders (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  shop_user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  table_number INTEGER,
+  customer_name TEXT,
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'done')),
+  total DECIMAL(10, 2) NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS self_order_items (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  self_order_id UUID NOT NULL REFERENCES self_orders(id) ON DELETE CASCADE,
+  item_id UUID REFERENCES items(id) ON DELETE SET NULL,
+  item_name TEXT NOT NULL,
+  quantity INTEGER NOT NULL DEFAULT 1,
+  price DECIMAL(10, 2) NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_self_orders_shop ON self_orders(shop_user_id);
+CREATE INDEX IF NOT EXISTS idx_self_orders_status ON self_orders(shop_user_id, status);
+
+-- Migration if tables already exist:
+-- (run the CREATE TABLE blocks above in Supabase SQL Editor)
+
 -- Storage buckets (Supabase Dashboard → Storage → New bucket)
 -- 1. Name: avatars  → Public bucket: ON
 -- 2. Name: items    → Public bucket: ON

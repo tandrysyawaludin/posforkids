@@ -8,11 +8,11 @@ import type { User as UserType } from "@/lib/types";
 
 const navItems = [
   { href: "/dashboard", label: "Home", emoji: "🏠" },
+  { href: "/incoming", label: "Orders", emoji: "🛎️" },
   { href: "/sell", label: "Sell", emoji: "🛒" },
   { href: "/tables", label: "Tables", emoji: "🪑" },
   { href: "/items", label: "Items", emoji: "📦" },
   { href: "/history", label: "History", emoji: "📜" },
-  { href: "/profile", label: "Me", emoji: "😊" },
 ];
 
 export default function Navbar({ user }: { user: UserType }) {
