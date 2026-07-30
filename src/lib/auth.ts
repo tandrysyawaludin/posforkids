@@ -26,7 +26,7 @@ export async function createSession(userId: string) {
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     maxAge: SESSION_MAX_AGE,
-    path: "/vercel-agent",
+    path: "/",
   });
 }
 
@@ -37,7 +37,7 @@ export async function destroySession() {
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     maxAge: 0,
-    path: "/vercel-agent",
+    path: "/",
   });
 }
 

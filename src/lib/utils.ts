@@ -7,7 +7,6 @@ export function normalizeCode(code: string): string {
 }
 
 export function assetUrl(path: string): string {
-  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "/vercel-agent";
   if (path.startsWith("http")) return path;
-  return `${basePath}${path.startsWith("/") ? path : `/${path}`}`;
+  return path.startsWith("/") ? path : `/${path}`;
 }

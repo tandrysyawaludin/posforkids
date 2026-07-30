@@ -1,10 +1,6 @@
-const BASE_PATH = "/vercel-agent";
-
 export async function apiFetch(
   path: string,
   options?: RequestInit
 ): Promise<Response> {
-  return fetch(`${BASE_PATH}${path}`, options);
+  return fetch(path, options);
 }
-
-export { BASE_PATH };

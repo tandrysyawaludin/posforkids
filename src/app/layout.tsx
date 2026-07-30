@@ -9,7 +9,7 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
-  title: "POS for Kids 🛒",
+  title: "POS for Kids",
   description: "A fun point-of-sale game for kids!",
 };
 

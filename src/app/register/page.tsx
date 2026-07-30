@@ -30,7 +30,7 @@ export default function RegisterPage() {
       return;
     }
 
-    window.location.href = "/vercel-agent/dashboard";
+    window.location.href = "/dashboard";
   };
 
   return (

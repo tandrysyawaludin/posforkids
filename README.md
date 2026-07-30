@@ -15,7 +15,7 @@ A fun, kid-friendly Point of Sale (POS) web app where kids can run their own sho
 
 ## Tech Stack
 
-- **Next.js 16** (App Router) — deployed at `/vercel-agent`
+- **Next.js 16** (App Router)
 - **Supabase** — PostgreSQL database + Storage for images
 - **Tesseract.js** — client-side OCR for paper code scanning
 - **Tailwind CSS** — styling
@@ -49,14 +49,14 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000/vercel-agent](http://localhost:3000/vercel-agent)
+Open [http://localhost:3000](http://localhost:3000)
 
 ### 4. Deploy to Vercel
 
 1. Push to GitHub
 2. Import project in [Vercel](https://vercel.com)
 3. Add the environment variables from step 2
-4. Deploy — the app will be available at `https://your-domain.vercel.app/vercel-agent`
+4. Deploy — the app will be available at `https://your-domain.vercel.app`
 
 ## How Kids Play
 

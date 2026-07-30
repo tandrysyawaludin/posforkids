@@ -18,7 +18,7 @@ export default function Navbar({ user }: { user: UserType }) {
 
   const logout = async () => {
     await apiFetch("/api/auth/logout", { method: "POST" });
-    window.location.href = "/vercel-agent/login";
+    window.location.href = "/login";
   };
 
   return (
