@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+:root {
+  --background: #fff5f8;
+  --foreground: #2d1b4e;
+  --pink: #ff6b9d;
+  --pink-light: #ffb3cc;
+  --yellow: #ffd93d;
+  --blue: #6bcbff;
+  --mint: #6bffb8;
+  --purple: #b388ff;
+  --orange: #ffab40;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-nunito);
+}
+
+body {
+  background: linear-gradient(135deg, #fff5f8 0%, #e8f4ff 50%, #f0fff4 100%);
+  color: var(--foreground);
+  font-family: var(--font-nunito), "Comic Sans MS", cursive, sans-serif;
+  min-height: 100vh;
+}
+
+@keyframes bounce-in {
+  0% { transform: scale(0.8); opacity: 0; }
+  60% { transform: scale(1.05); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.animate-bounce-in {
+  animation: bounce-in 0.4s ease-out;
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+}
+
+.animate-wiggle {
+  animation: wiggle 0.5s ease-in-out infinite;
+}
