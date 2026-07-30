@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Plus, Pencil, Trash2, Camera } from "lucide-react";
 import BigButton from "@/components/BigButton";
 import CameraCapture from "@/components/CameraCapture";
+import ItemImage from "@/components/ItemImage";
 import { apiFetch } from "@/lib/api";
 import { formatPrice } from "@/lib/utils";
 import type { Item } from "@/lib/types";
@@ -170,10 +171,9 @@ export default function ItemsPage() {
             className="w-full h-40 bg-gray-100 rounded-2xl flex flex-col items-center justify-center cursor-pointer border-4 border-dashed border-[#ffb3cc] hover:border-[#ff6b9d] transition-colors overflow-hidden"
           >
             {imageUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <ItemImage
                 src={imageUrl}
-                alt="Item"
+                alt="Item preview"
                 className="w-full h-full object-cover"
               />
             ) : (
@@ -244,18 +244,11 @@ export default function ItemsPage() {
               key={item.id}
               className="bg-white rounded-3xl p-4 shadow-md flex gap-4 items-center"
             >
-              {item.image_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={item.image_url}
-                  alt={item.name}
-                  className="w-20 h-20 rounded-2xl object-cover"
-                />
-              ) : (
-                <div className="w-20 h-20 rounded-2xl bg-[#ffb3cc] flex items-center justify-center text-3xl">
-                  🍽️
-                </div>
-              )}
+              <ItemImage
+                src={item.image_url}
+                alt={item.name}
+                className="w-20 h-20 rounded-2xl object-cover"
+              />
               <div className="flex-1">
                 <h3 className="text-xl font-extrabold">{item.name}</h3>
                 <p className="text-gray-500 font-mono font-bold">

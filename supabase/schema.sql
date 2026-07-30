@@ -57,3 +57,7 @@ CREATE INDEX IF NOT EXISTS idx_orders_user_id ON orders(user_id);
 -- Storage buckets (Supabase Dashboard → Storage → New bucket)
 -- 1. Name: avatars  → Public bucket: ON
 -- 2. Name: items    → Public bucket: ON
+
+-- Storage policies (run in SQL Editor if needed):
+-- CREATE POLICY "Public read avatars" ON storage.objects FOR SELECT USING (bucket_id = 'avatars');
+-- CREATE POLICY "Public read items" ON storage.objects FOR SELECT USING (bucket_id = 'items');

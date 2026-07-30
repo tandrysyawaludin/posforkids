@@ -1,12 +1,12 @@
 import sharp from "sharp";
 import { getSupabaseAdmin } from "./supabase";
+import {
+  STORAGE_BUCKETS,
+  getImageServeUrl,
+  type StorageBucket,
+} from "./imageUrl";
 
-export const STORAGE_BUCKETS = {
-  avatars: "avatars",
-  items: "items",
-} as const;
-
-export type StorageBucket = keyof typeof STORAGE_BUCKETS;
+export { STORAGE_BUCKETS, type StorageBucket } from "./imageUrl";
 
 export async function uploadImage(
   bucket: StorageBucket,
@@ -35,9 +35,5 @@ export async function uploadImage(
 
   if (error) throw new Error(error.message);
 
-  const { data } = supabase.storage
-    .from(STORAGE_BUCKETS[bucket])
-    .getPublicUrl(path);
-
-  return data.publicUrl;
+  return getImageServeUrl(bucket, path);
 }

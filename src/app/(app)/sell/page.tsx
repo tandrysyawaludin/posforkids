@@ -8,7 +8,9 @@ import OcrScanner from "@/components/OcrScanner";
 import Receipt from "@/components/Receipt";
 import { apiFetch } from "@/lib/api";
 import { formatPrice, normalizeCode } from "@/lib/utils";
+import { matchItemCode } from "@/lib/matchCode";
 import { TABLES } from "@/lib/constants";
+import ItemImage from "@/components/ItemImage";
 import type { Item, CartItem } from "@/lib/types";
 
 export default function SellPage() {
@@ -47,10 +49,14 @@ export default function SellPage() {
   );
 
   const findAndAdd = (rawCode: string) => {
-    const code = normalizeCode(rawCode);
-    const item = items.find((i) => normalizeCode(i.code) === code);
+    const matched = matchItemCode(
+      rawCode,
+      items.map((i) => i.code)
+    );
+    const item = items.find((i) => normalizeCode(i.code) === matched);
 
     if (!item) {
+      const code = normalizeCode(rawCode);
       setNotFound(`Item "${code}" not found! 😢`);
       setTimeout(() => setNotFound(""), 3000);
       return;
@@ -221,18 +227,11 @@ export default function SellPage() {
                 onClick={() => findAndAdd(item.code)}
                 className="bg-white rounded-2xl p-3 shadow-sm hover:shadow-md transition-all text-left flex items-center gap-2"
               >
-                {item.image_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={item.image_url}
-                    alt={item.name}
-                    className="w-12 h-12 rounded-xl object-cover"
-                  />
-                ) : (
-                  <div className="w-12 h-12 rounded-xl bg-[#ffb3cc] flex items-center justify-center text-xl">
-                    🍽️
-                  </div>
-                )}
+                <ItemImage
+                  src={item.image_url}
+                  alt={item.name}
+                  className="w-12 h-12 rounded-xl object-cover"
+                />
                 <div>
                   <p className="font-extrabold text-sm">{item.name}</p>
                   <p className="text-[#ff6b9d] font-bold text-sm">
@@ -348,6 +347,7 @@ export default function SellPage() {
 
       {showScanner && (
         <OcrScanner
+          codes={items.map((i) => i.code)}
           onScan={findAndAdd}
           onClose={() => setShowScanner(false)}
         />
