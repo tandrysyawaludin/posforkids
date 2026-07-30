@@ -8,9 +8,8 @@ import OcrScanner from "@/components/OcrScanner";
 import Receipt from "@/components/Receipt";
 import { apiFetch } from "@/lib/api";
 import { formatPrice, normalizeCode } from "@/lib/utils";
+import { TABLES } from "@/lib/constants";
 import type { Item, CartItem } from "@/lib/types";
-
-const TABLES = [1, 2, 3, 4, 5, 6, 7, 8];
 
 export default function SellPage() {
   const [items, setItems] = useState<Item[]>([]);

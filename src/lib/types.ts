@@ -25,9 +25,19 @@ export interface Order {
   id: string;
   user_id: string;
   table_number: number | null;
+  table_status: "eating" | "done" | null;
   payment_method: "cash" | "credit";
   total: number;
   created_at: string;
+  order_items?: OrderItem[];
+}
+
+export interface TableActivity {
+  table_number: number;
+  occupied: boolean;
+  order_id?: string;
+  total?: number;
+  started_at?: string;
 }
 
 export interface OrderItem {

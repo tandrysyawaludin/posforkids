@@ -30,10 +30,14 @@ CREATE TABLE IF NOT EXISTS orders (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   table_number INTEGER,
+  table_status TEXT CHECK (table_status IN ('eating', 'done')),
   payment_method TEXT NOT NULL CHECK (payment_method IN ('cash', 'credit')),
   total DECIMAL(10, 2) NOT NULL,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- If orders table already exists, run this:
+-- ALTER TABLE orders ADD COLUMN IF NOT EXISTS table_status TEXT CHECK (table_status IN ('eating', 'done'));
 
 -- Order line items
 CREATE TABLE IF NOT EXISTS order_items (

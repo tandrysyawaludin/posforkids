@@ -20,6 +20,20 @@ export default function DashboardPage() {
           </BigButton>
         </Link>
 
+        <Link href="/tables">
+          <BigButton color="orange" className="w-full" size="xl">
+            <span className="text-4xl">🪑</span>
+            Table Activity
+          </BigButton>
+        </Link>
+
+        <Link href="/history">
+          <BigButton color="yellow" className="w-full" size="xl">
+            <span className="text-4xl">📜</span>
+            Sales History
+          </BigButton>
+        </Link>
+
         <Link href="/items">
           <BigButton color="blue" className="w-full" size="xl">
             <span className="text-4xl">📦</span>

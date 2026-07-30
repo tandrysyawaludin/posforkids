@@ -2,15 +2,17 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Package, ShoppingCart, User, LogOut } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import type { User as UserType } from "@/lib/types";
 
 const navItems = [
-  { href: "/dashboard", icon: Home, label: "Home", emoji: "🏠" },
-  { href: "/items", icon: Package, label: "Items", emoji: "📦" },
-  { href: "/sell", icon: ShoppingCart, label: "Sell", emoji: "🛒" },
-  { href: "/profile", icon: User, label: "Me", emoji: "😊" },
+  { href: "/dashboard", label: "Home", emoji: "🏠" },
+  { href: "/sell", label: "Sell", emoji: "🛒" },
+  { href: "/tables", label: "Tables", emoji: "🪑" },
+  { href: "/items", label: "Items", emoji: "📦" },
+  { href: "/history", label: "History", emoji: "📜" },
+  { href: "/profile", label: "Me", emoji: "😊" },
 ];
 
 export default function Navbar({ user }: { user: UserType }) {
@@ -50,7 +52,7 @@ export default function Navbar({ user }: { user: UserType }) {
         </button>
       </div>
 
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-3 gap-2">
         {navItems.map((item) => {
           const isActive = pathname.includes(item.href);
           return (
@@ -58,7 +60,7 @@ export default function Navbar({ user }: { user: UserType }) {
               key={item.href}
               href={item.href}
               className={`
-                flex flex-col items-center gap-1 p-3 rounded-2xl transition-all
+                flex flex-col items-center gap-1 p-2 rounded-2xl transition-all
                 ${isActive
                   ? "bg-[#ff6b9d] text-white scale-105 shadow-md"
                   : "bg-gray-50 hover:bg-gray-100 text-[#2d1b4e]"
@@ -66,7 +68,7 @@ export default function Navbar({ user }: { user: UserType }) {
               `}
             >
               <span className="text-2xl">{item.emoji}</span>
-              <span className="text-sm font-bold">{item.label}</span>
+              <span className="text-xs font-bold">{item.label}</span>
             </Link>
           );
         })}
